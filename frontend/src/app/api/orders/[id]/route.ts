@@ -5,11 +5,11 @@ const BASE = 'https://rz0z72aem4.execute-api.us-east-1.amazonaws.com/Prod';
 // ── PATCH /api/orders/[id] — public ───────────────────────────────────────────
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const orderId = params.id;
-    const body    = await req.json();
+    const { id: orderId } = await params;
+    const body = await req.json();
 
     if (!orderId) {
       return NextResponse.json({ error: 'orderId required' }, { status: 400 });
@@ -32,12 +32,12 @@ export async function PATCH(
 // ── GET /api/orders/[id] — public ─────────────────────────────────────────────
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const orderId = params.id;
-    const qs      = req.nextUrl.searchParams.toString();
-    const url     = `${BASE}/orders/${orderId}${qs ? `?${qs}` : ''}`;
+    const { id: orderId } = await params;
+    const qs  = req.nextUrl.searchParams.toString();
+    const url = `${BASE}/orders/${orderId}${qs ? `?${qs}` : ''}`;
 
     const res  = await fetch(url, { cache: 'no-store' });
     const text = await res.text();
